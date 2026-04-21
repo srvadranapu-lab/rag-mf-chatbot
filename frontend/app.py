@@ -114,7 +114,6 @@ html, body, [class*="css"] {{
     align-items: center;
     gap: 0.65rem;
     padding: 1.3rem 0 1rem;
-    border-bottom: 1px solid var(--border);
     width: 100%;
     box-sizing: border-box;
 }}
@@ -139,28 +138,37 @@ html, body, [class*="css"] {{
     border: 1px solid var(--pill-border);
     white-space: nowrap;
 }}
+/* Navbar wrapper — full width with border-bottom */
+.nav-wrapper {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.3rem 0 1rem;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}}
 /* Right col: toggle button */
 .nav-right {{
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding: 1.3rem 0 1rem;
-    border-bottom: 1px solid var(--border);
     width: 100%;
     box-sizing: border-box;
 }}
-/* Style the toggle as a round icon button */
+/* Style the toggle as a compact pill button right beside the nav-pill */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button {{
     background: var(--bg2) !important;
     color: var(--text) !important;
     border: 1.5px solid var(--border) !important;
-    border-radius: 50% !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    padding: 0 !important;
-    font-size: 1.05rem !important;
-    font-weight: 400 !important;
+    border-radius: 20px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 0.8rem !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
     box-shadow: none !important;
     transform: none !important;
     letter-spacing: 0 !important;
@@ -168,7 +176,8 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
     align-items: center !important;
     justify-content: center !important;
     margin-left: auto !important;
-    width: 36px !important;
+    white-space: nowrap !important;
+    width: auto !important;
 }}
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button:hover {{
     border-color: var(--accent) !important;
@@ -219,7 +228,6 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
     font-weight: 800;
     font-size: clamp(1.2rem, 3.2vw, 1.6rem);
     letter-spacing: 0.2em;
-    text-transform: uppercase;
     color: var(--accent);
     margin-bottom: 0.4rem;
 }}
@@ -244,6 +252,15 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
     max-width: 520px;
     margin: 0 auto 1.8rem;
     text-align: center;
+}}
+
+/* ══ CTA BUTTON — centered ═══════════════════════════════════════════════════ */
+div[data-testid="stHorizontalBlock"]:has(#cta_btn) {{
+    justify-content: center !important;
+}}
+#cta_btn ~ div, button[kind="primary"]#cta_btn {{
+    display: flex;
+    justify-content: center;
 }}
 
 /* ══ ALL BUTTONS — base green ════════════════════════════════════════════════ */
@@ -340,6 +357,7 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
 }}
 
 /* ══ BACK BUTTON ════════════════════════════════════════════════════════════ */
+.back-wrap {{ display: inline-block; margin-top: 0.8rem; margin-bottom: 0.5rem; }}
 .back-wrap .stButton > button {{
     background: var(--bg2) !important;
     color: var(--text) !important;
@@ -465,11 +483,11 @@ div[data-testid="column"] .stButton > button:hover {{
 }}
 
 /* ══ SEND BUTTON — matches input height ══════════════════════════════════════ */
-.send-wrap {{ width: 100%; }}
+.send-wrap {{ width: 100%; margin-top: 0; }}
 .send-wrap .stButton > button {{
     height: 46px !important;
     min-height: 46px !important;
-    padding: 0 0.5rem !important;
+    padding: 0 1rem !important;
     font-size: 0.88rem !important;
     border-radius: 10px !important;
     width: 100% !important;
@@ -478,9 +496,14 @@ div[data-testid="column"] .stButton > button:hover {{
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    margin-top: 0 !important;
 }}
 .send-wrap .stButton > button:hover {{
     transform: none !important;
+}}
+/* Align send button column with input — remove label gap */
+div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
+    align-items: flex-end !important;
 }}
 
 /* ══ FOOTER ══════════════════════════════════════════════════════════════════ */
@@ -523,7 +546,8 @@ div[data-testid="column"] .stButton > button:hover {{
 # the right col up to align with the left col's border-bottom line.
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
-    col_l, col_r = st.columns([9, 1])
+    toggle_label = "☀️ Turn on the lights" if dark else "🌙 Turn off the lights"
+    col_l, col_r = st.columns([7, 3])
     with col_l:
         st.markdown("""
         <div class="nav-left">
@@ -535,10 +559,12 @@ def render_navbar(page_key: str):
         st.markdown("""
         <div class="nav-right">
         """, unsafe_allow_html=True)
-        if st.button(moon_or_sun, key=f"theme_{page_key}"):
+        if st.button(toggle_label, key=f"theme_{page_key}"):
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
+    # Full-width border-bottom line under the navbar
+    st.markdown('<hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">', unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -553,9 +579,8 @@ def render_home():
             <span class="green-dot"></span>&nbsp;Official sources only · No investment advice
         </div>
         <h1 class="hero-title">
-            <span class="stop-guess">Stop Guessing.</span>
-            Get <span class="accent">fund facts</span> you can<br>
-            <span class="underline-word">actually trust</span>.
+            <span class="stop-guess">STOP GUESSING</span>
+            Get <span class="accent">fund facts</span> you can <span class="underline-word">actually trust</span>.
         </h1>
         <p class="hero-desc">
             Expense ratios, exit loads, SIP minimums, ELSS lock-ins —
@@ -662,11 +687,9 @@ def render_chat():
 
     # ── Back button ──────────────────────────────────────────────────────────
     st.markdown('<div class="back-wrap">', unsafe_allow_html=True)
-    col_b, _ = st.columns([1, 5])
-    with col_b:
-        if st.button("← Back", key="back_btn"):
-            st.session_state.page = "home"
-            st.rerun()
+    if st.button("← Back", key="back_btn"):
+        st.session_state.page = "home"
+        st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
     # ── Chat header ──────────────────────────────────────────────────────────
