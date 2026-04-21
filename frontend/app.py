@@ -3,7 +3,7 @@ import requests
 
 st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 
-# Backend API URL (REPLACE with your Render URL)
+# 🔴 REPLACE WITH YOUR ACTUAL RENDER URL
 API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
 # Title
@@ -24,13 +24,15 @@ query = st.text_input("Ask your question:")
 if query:
     with st.spinner("Fetching answer..."):
         try:
-    response = requests.post(API_URL, json={"question": query})
-    st.write("Status Code:", response.status_code)
-    st.write("Response:", response.text)
-    response.raise_for_status()
-    answer = response.json()["answer"]
-except Exception as e:
-    answer = f"Error: {e}"
+            response = requests.post(API_URL, json={"question": query})
+            response.raise_for_status()
+            answer = response.json()["answer"]
+        except Exception as e:
+            answer = f"Error: {str(e)}"
 
         st.markdown("### Answer")
         st.write(answer)
+
+# Footer
+st.markdown("---")
+st.caption("Data sourced from HDFC AMC, AMFI, SEBI, and Groww.")
