@@ -273,6 +273,7 @@ html, body, [class*="css"] {{
 }}
 
 /* ══ NAVBAR ICON BUTTON (theme toggle beside pill) ═══════════════════════════ */
+.nav-icon-wrap {{ display: flex; align-items: center; justify-content: flex-end; padding-top: 1rem; }}
 .nav-icon-wrap .stButton > button {{
     background: var(--bg2) !important;
     color: var(--text) !important;
@@ -286,7 +287,7 @@ html, body, [class*="css"] {{
     padding: 0 !important;
     box-shadow: none !important;
     transform: none !important;
-    margin-top: 1.1rem !important;
+    margin: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -517,24 +518,27 @@ div[data-testid="column"] .stButton > button:hover {{
     outline: none !important;
 }}
 
-/* ══ SEND BUTTON — matches input height ══════════════════════════════════════ */
-.send-wrap {{ width: 100%; margin-top: 0; }}
+/* ══ SEND BUTTON — small circle inline with input ════════════════════════════ */
+.send-wrap {{ width: 100%; margin-top: 0; display: flex; align-items: flex-end; }}
 .send-wrap .stButton > button {{
-    height: 46px !important;
-    min-height: 46px !important;
-    padding: 0 1rem !important;
-    font-size: 0.88rem !important;
-    border-radius: 10px !important;
-    width: 100% !important;
-    box-shadow: 0 2px 10px rgba(0,179,65,0.22) !important;
+    height: 38px !important;
+    width: 38px !important;
+    min-height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 !important;
+    font-size: 1.05rem !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 8px rgba(0,179,65,0.22) !important;
     transform: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    margin-bottom: 4px !important;
     margin-top: 0 !important;
 }}
 .send-wrap .stButton > button:hover {{
     transform: none !important;
+    box-shadow: 0 4px 14px rgba(0,179,65,0.34) !important;
 }}
 /* Align send button column with input — remove label gap */
 div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
@@ -804,7 +808,7 @@ def render_chat():
 
     # ── Input + Send (vertically aligned) ───────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
-    inp_col, btn_col = st.columns([5, 1])
+    inp_col, btn_col = st.columns([8, 1])
     with inp_col:
         user_input = st.text_input(
             "q", value="", key="chat_input",
@@ -813,7 +817,7 @@ def render_chat():
         )
     with btn_col:
         st.markdown('<div class="send-wrap">', unsafe_allow_html=True)
-        send = st.button("Send ↵", key="send_btn")
+        send = st.button("↑", key="send_btn")
         st.markdown('</div>', unsafe_allow_html=True)
 
     if send and user_input.strip():
