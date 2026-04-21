@@ -138,6 +138,29 @@ html, body, [class*="css"] {{
     border: 1px solid var(--pill-border);
     white-space: nowrap;
 }}
+.nav-icon-btn {{
+    background: var(--bg2);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+    flex-shrink: 0;
+    padding: 0;
+    margin-left: 0.5rem;
+}}
+.nav-icon-btn:hover {{
+    border-color: var(--accent);
+    background: var(--bg3);
+}}
 /* Navbar wrapper — full width with border-bottom */
 .nav-wrapper {{
     display: flex;
@@ -191,6 +214,9 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
     padding: 3.2rem 0 1.8rem;
     text-align: center;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }}
 .hero-tag {{
     display: inline-flex;
@@ -250,8 +276,10 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
     font-size: 0.95rem;
     line-height: 1.75;
     max-width: 520px;
-    margin: 0 auto 1.8rem;
+    margin: 0 auto 1.8rem auto;
     text-align: center;
+    display: block;
+    width: 100%;
 }}
 
 /* ══ CTA BUTTON — centered ═══════════════════════════════════════════════════ */
@@ -546,25 +574,23 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
 # the right col up to align with the left col's border-bottom line.
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
-    toggle_label = "☀️ Turn on the lights" if dark else "🌙 Turn off the lights"
-    col_l, col_r = st.columns([7, 3])
-    with col_l:
-        st.markdown("""
-        <div class="nav-left">
-            <span class="nav-brand">Groww</span>
-            <span class="nav-pill">HDFC AMC · Facts Only</span>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_r:
-        st.markdown("""
-        <div class="nav-right">
-        """, unsafe_allow_html=True)
-        if st.button(toggle_label, key=f"theme_{page_key}"):
-            st.session_state.dark_mode = not st.session_state.dark_mode
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-    # Full-width border-bottom line under the navbar
-    st.markdown('<hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">', unsafe_allow_html=True)
+    icon = "☀️" if dark else "🌙"
+    # Left side: brand + pill + icon button — all in one HTML row
+    # The Streamlit button is hidden visually; clicking the HTML icon triggers it via JS
+    st.markdown(f"""
+    <div class="nav-left">
+        <span class="nav-brand">Groww</span>
+        <span class="nav-pill">HDFC AMC · Facts Only</span>
+        <button class="nav-icon-btn" onclick="document.querySelector('#theme_{page_key}_real button').click()">{icon}</button>
+    </div>
+    <hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">
+    """, unsafe_allow_html=True)
+    # Hidden real Streamlit button
+    st.markdown('<div id="theme_{}_real" style="display:none;">'.format(page_key), unsafe_allow_html=True)
+    if st.button(icon, key=f"theme_{page_key}"):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
