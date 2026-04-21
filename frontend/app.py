@@ -112,10 +112,15 @@ html, body, [class*="css"] {{
 .nav-left {{
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    justify-content: space-between;
     padding: 1.3rem 0 1rem;
     width: 100%;
     box-sizing: border-box;
+}}
+.nav-right-group {{
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
 }}
 .nav-brand {{
     font-size: 2rem;
@@ -534,6 +539,28 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
     align-items: flex-end !important;
 }}
 
+/* ══ CTA HTML BUTTON ═════════════════════════════════════════════════════════ */
+.cta-html-btn {{
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.78rem 2.4rem;
+    cursor: pointer;
+    box-shadow: 0 3px 16px rgba(0,179,65,0.28);
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    letter-spacing: 0.01em;
+    display: inline-block;
+}}
+.cta-html-btn:hover {{
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,179,65,0.36);
+}}
+
 /* ══ FOOTER ══════════════════════════════════════════════════════════════════ */
 .site-footer {{
     text-align: center;
@@ -575,17 +602,16 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
     icon = "☀️" if dark else "🌙"
-    # Left side: brand + pill + icon button — all in one HTML row
-    # The Streamlit button is hidden visually; clicking the HTML icon triggers it via JS
     st.markdown(f"""
     <div class="nav-left">
         <span class="nav-brand">Groww</span>
-        <span class="nav-pill">HDFC AMC · Facts Only</span>
-        <button class="nav-icon-btn" onclick="document.querySelector('#theme_{page_key}_real button').click()">{icon}</button>
+        <div class="nav-right-group">
+            <span class="nav-pill">HDFC AMC · Facts Only</span>
+            <button class="nav-icon-btn" onclick="document.querySelector('#theme_{page_key}_real button').click()">{icon}</button>
+        </div>
     </div>
     <hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">
     """, unsafe_allow_html=True)
-    # Hidden real Streamlit button
     st.markdown('<div id="theme_{}_real" style="display:none;">'.format(page_key), unsafe_allow_html=True)
     if st.button(icon, key=f"theme_{page_key}"):
         st.session_state.dark_mode = not st.session_state.dark_mode
@@ -616,12 +642,17 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # CTA — perfectly centred
-    col_l, col_c, col_r = st.columns([1.5, 2, 1.5])
-    with col_c:
-        if st.button("Ask a question →", key="cta_btn"):
-            st.session_state.page = "chat"
-            st.rerun()
+    # CTA — perfectly centred via HTML
+    st.markdown("""
+    <div style="display:flex;justify-content:center;margin-bottom:0.5rem;">
+        <button class="cta-html-btn" onclick="document.querySelector('#cta_real button').click()">Ask a question →</button>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown('<div id="cta_real" style="display:none;">', unsafe_allow_html=True)
+    if st.button("Ask a question →", key="cta_btn"):
+        st.session_state.page = "chat"
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("""
     <div class="stats-row" style="margin-top:2.4rem;">
