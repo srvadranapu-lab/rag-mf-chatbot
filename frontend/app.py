@@ -266,11 +266,21 @@ html, body, [class*="css"] {{
 .cta-center-wrap {{
     display: flex;
     justify-content: center;
-    margin-bottom: 0.5rem;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto 0.5rem auto;
+    text-align: center;
+}}
+.cta-center-wrap .stButton {{
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
 }}
 .cta-center-wrap .stButton > button {{
     width: auto !important;
     padding: 0.78rem 2.4rem !important;
+    margin: 0 auto !important;
+    display: block !important;
 }}
 
 /* ══ NAVBAR ICON BUTTON (theme toggle beside pill) ═══════════════════════════ */
