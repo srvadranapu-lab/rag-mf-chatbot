@@ -112,7 +112,8 @@ html, body, [class*="css"] {{
 .nav-left {{
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 0.75rem;
     padding: 1.3rem 0 1rem;
     width: 100%;
     box-sizing: border-box;
@@ -518,23 +519,24 @@ div[data-testid="column"] .stButton > button:hover {{
     outline: none !important;
 }}
 
-/* ══ SEND BUTTON — small circle inline with input ════════════════════════════ */
+/* ══ SEND BUTTON — small rectangle inline with input ════════════════════════ */
 .send-wrap {{ width: 100%; margin-top: 0; display: flex; align-items: flex-end; }}
 .send-wrap .stButton > button {{
-    height: 38px !important;
-    width: 38px !important;
-    min-height: 38px !important;
-    min-width: 38px !important;
-    padding: 0 !important;
+    height: 46px !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    min-width: 52px !important;
+    padding: 0 0.6rem !important;
     font-size: 1.05rem !important;
-    border-radius: 50% !important;
+    border-radius: 10px !important;
     box-shadow: 0 2px 8px rgba(0,179,65,0.22) !important;
     transform: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 0 !important;
     margin-top: 0 !important;
+    letter-spacing: 0 !important;
 }}
 .send-wrap .stButton > button:hover {{
     transform: none !important;
@@ -588,14 +590,12 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
     icon = "☀️" if dark else "🌙"
-    nav_col, btn_col = st.columns([10, 1])
+    nav_col, btn_col = st.columns([11, 1])
     with nav_col:
         st.markdown(f"""
         <div class="nav-left">
             <span class="nav-brand">Groww</span>
-            <div class="nav-right-group">
-                <span class="nav-pill">HDFC AMC · Facts Only</span>
-            </div>
+            <span class="nav-pill">HDFC AMC · Facts Only</span>
         </div>
         """, unsafe_allow_html=True)
     with btn_col:
@@ -605,6 +605,7 @@ def render_navbar(page_key: str):
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">', unsafe_allow_html=True)
+
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -630,7 +631,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # CTA — centred Streamlit button
+    # CTA — centred Streamlit button, placed right below the hero description
     st.markdown('<div class="cta-center-wrap">', unsafe_allow_html=True)
     if st.button("Ask a question →", key="cta_btn"):
         st.session_state.page = "chat"
