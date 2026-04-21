@@ -5,7 +5,7 @@ import os
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, ROOT_DIR)
 
-from app.rag import generate_answer
+import requests
 
 st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 
@@ -26,6 +26,9 @@ query = st.text_input("Ask your question:")
 
 if query:
     with st.spinner("Fetching answer..."):
-        answer = generate_answer(query)
+        API_URL = "https://rag-mf-chatbot-1.onrender.com/"
+
+response = requests.post(API_URL, json={"question": query})
+answer = response.json()["answer"]
         st.markdown("### Answer")
         st.write(answer)
