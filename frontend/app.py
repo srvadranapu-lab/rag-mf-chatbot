@@ -10,7 +10,7 @@ st.set_page_config(
 
 API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
-# ─── Session state defaults ──────────────────────────────────────────────────
+# ─── Session state defaults ───────────────────────────────────────────────────
 if "page" not in st.session_state:
     st.session_state.page = "home"
 if "messages" not in st.session_state:
@@ -20,146 +20,168 @@ if "pending_query" not in st.session_state:
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = False
 
-# ─── Theme toggle ────────────────────────────────────────────────────────────
 dark = st.session_state.dark_mode
+moon_or_sun = "☀️" if dark else "🌙"
 
-# ─── Global CSS ──────────────────────────────────────────────────────────────
+# ─── Theme variables ──────────────────────────────────────────────────────────
 theme_vars = """
-    --bg:           #0d1117;
-    --bg2:          #161b22;
-    --bg3:          #1c2128;
-    --border:       #30363d;
-    --text:         #e6edf3;
-    --text-muted:   #7d8590;
-    --text-strong:  #f0f6fc;
-    --accent:       #00c853;
-    --accent-hover: #00e676;
-    --blue:         #2563eb;
-    --pill-bg:      rgba(0,200,83,0.12);
-    --pill-color:   #00c853;
-    --pill-border:  rgba(0,200,83,0.25);
-    --card-shadow:  0 2px 12px rgba(0,0,0,0.4);
+    --bg:             #0d1117;
+    --bg2:            #161b22;
+    --bg3:            #1c2128;
+    --border:         #30363d;
+    --text:           #e6edf3;
+    --text-muted:     #7d8590;
+    --text-strong:    #f0f6fc;
+    --accent:         #00c853;
+    --accent-hover:   #00e676;
+    --pill-bg:        rgba(0,200,83,0.12);
+    --pill-color:     #00c853;
+    --pill-border:    rgba(0,200,83,0.25);
+    --card-shadow:    0 2px 12px rgba(0,0,0,0.4);
     --bubble-user-bg: #2563eb;
     --bubble-bot-bg:  #1c2128;
     --bubble-bot-text:#e6edf3;
-    --input-bg:     #161b22;
-    --footer-color: #30363d;
-    --tag-bg:       rgba(0,200,83,0.1);
-    --tag-border:   rgba(0,200,83,0.2);
-    --tag-color:    #7d8590;
-    --disc-bg:      rgba(255,200,0,0.07);
-    --disc-border:  rgba(255,200,0,0.18);
-    --disc-color:   #b8860b;
+    --input-bg:       #161b22;
+    --footer-color:   #30363d;
+    --tag-bg:         rgba(0,200,83,0.1);
+    --tag-border:     rgba(0,200,83,0.2);
+    --tag-color:      #7d8590;
+    --disc-bg:        rgba(255,200,0,0.07);
+    --disc-border:    rgba(255,200,0,0.18);
+    --disc-color:     #cca300;
 """ if dark else """
-    --bg:           #f7f9f7;
-    --bg2:          #ffffff;
-    --bg3:          #f0f7f0;
-    --border:       #e2e8e2;
-    --text:         #1a2e1a;
-    --text-muted:   #6b7c6b;
-    --text-strong:  #0d1f0d;
-    --accent:       #00b341;
-    --accent-hover: #009933;
-    --blue:         #2563eb;
-    --pill-bg:      #e8f5e9;
-    --pill-color:   #00b341;
-    --pill-border:  #b2dfdb;
-    --card-shadow:  0 1px 4px rgba(0,0,0,0.06);
+    --bg:             #f7f9f7;
+    --bg2:            #ffffff;
+    --bg3:            #f0f7f0;
+    --border:         #e2e8e2;
+    --text:           #1a2e1a;
+    --text-muted:     #6b7c6b;
+    --text-strong:    #0d1f0d;
+    --accent:         #00b341;
+    --accent-hover:   #009933;
+    --pill-bg:        #e8f5e9;
+    --pill-color:     #00b341;
+    --pill-border:    #b2dfdb;
+    --card-shadow:    0 1px 4px rgba(0,0,0,0.06);
     --bubble-user-bg: #2563eb;
     --bubble-bot-bg:  #ffffff;
     --bubble-bot-text:#1a2e1a;
-    --input-bg:     #ffffff;
-    --footer-color: #b2c2b2;
-    --tag-bg:       #f0faf0;
-    --tag-border:   #c8e6c9;
-    --tag-color:    #6b7c6b;
-    --disc-bg:      #fffde7;
-    --disc-border:  #ffe082;
-    --disc-color:   #795548;
+    --input-bg:       #ffffff;
+    --footer-color:   #b2c2b2;
+    --tag-bg:         #f0faf0;
+    --tag-border:     #c8e6c9;
+    --tag-color:      #6b7c6b;
+    --disc-bg:        #fffde7;
+    --disc-border:    #ffe082;
+    --disc-color:     #795548;
 """
 
+# ─── Global CSS ───────────────────────────────────────────────────────────────
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
 
-:root {{
-    {theme_vars}
-}}
+:root {{ {theme_vars} }}
 
 html, body, [class*="css"] {{
     font-family: 'Sora', sans-serif;
     color: var(--text);
 }}
-
 .stApp {{
     background: var(--bg);
     min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.3s ease;
 }}
-
 #MainMenu, footer, header {{ visibility: hidden; }}
 
+/* Page container — full-width, auto margins */
 .block-container {{
     padding-top: 0 !important;
     padding-bottom: 4rem !important;
-    max-width: 800px !important;
-    padding-left: 1.2rem !important;
-    padding-right: 1.2rem !important;
+    max-width: 820px !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
 }}
 
-/* ── Navbar ── */
-.navbar {{
+/* ══ NAVBAR ROW (rendered as st.columns) ════════════════════════════════════ */
+/* Left col: brand + pill */
+.nav-left {{
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1.4rem 0 1rem;
-    margin-bottom: 0.5rem;
+    gap: 0.65rem;
+    padding: 1.3rem 0 1rem;
     border-bottom: 1px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
 }}
-.navbar-brand {{
+.nav-brand {{
     font-size: 2rem;
     font-weight: 800;
     color: var(--accent);
-    letter-spacing: -0.04em;
     font-family: 'Sora', sans-serif;
+    letter-spacing: -0.04em;
     line-height: 1;
+    flex-shrink: 0;
 }}
-.navbar-right {{
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}}
-.navbar-pill {{
+.nav-pill {{
     background: var(--pill-bg);
     color: var(--pill-color);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
-    padding: 0.3rem 0.85rem;
+    padding: 0.28rem 0.8rem;
     border-radius: 999px;
     border: 1px solid var(--pill-border);
     white-space: nowrap;
 }}
-.theme-toggle {{
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+/* Right col: toggle button */
+.nav-right {{
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    padding: 1.3rem 0 1rem;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    box-sizing: border-box;
+}}
+/* Style the toggle as a round icon button */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    font-size: 1.05rem !important;
+    font-weight: 400 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    letter-spacing: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
+    width: 36px !important;
+}}
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button:hover {{
+    border-color: var(--accent) !important;
+    background: var(--bg3) !important;
+    transform: none !important;
+    box-shadow: none !important;
 }}
 
-/* ── Hero ── */
+/* ══ HERO ════════════════════════════════════════════════════════════════════ */
 .hero {{
-    padding: 3.5rem 0 2.2rem;
+    padding: 3.2rem 0 1.8rem;
     text-align: center;
+    width: 100%;
 }}
 .hero-tag {{
     display: inline-flex;
@@ -168,12 +190,11 @@ html, body, [class*="css"] {{
     background: var(--tag-bg);
     border: 1px solid var(--tag-border);
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     font-weight: 500;
     color: var(--tag-color);
-    padding: 0.32rem 1rem;
-    margin-bottom: 1.6rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    padding: 0.3rem 1rem;
+    margin-bottom: 1.5rem;
 }}
 .hero-tag .green-dot {{
     width: 7px; height: 7px;
@@ -184,12 +205,23 @@ html, body, [class*="css"] {{
 }}
 .hero-title {{
     font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5.5vw, 3.2rem);
+    font-size: clamp(2rem, 5.5vw, 3.1rem);
     font-weight: 400;
     color: var(--text-strong);
-    line-height: 1.18;
+    line-height: 1.22;
     letter-spacing: -0.01em;
-    margin: 0 0 1.2rem;
+    margin: 0 0 1.1rem;
+    text-align: center;
+}}
+.stop-guess {{
+    display: block;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.2rem, 3.2vw, 1.6rem);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
 }}
 .hero-title .accent {{ font-style: italic; color: var(--accent); }}
 .hero-title .underline-word {{
@@ -203,23 +235,18 @@ html, body, [class*="css"] {{
     width: 100%; height: 3px;
     background: var(--accent);
     border-radius: 2px;
-    opacity: 0.5;
+    opacity: 0.45;
 }}
 .hero-desc {{
     color: var(--text-muted);
-    font-size: 0.96rem;
-    font-weight: 400;
+    font-size: 0.95rem;
     line-height: 1.75;
-    max-width: 530px;
-    margin: 0 auto 2rem;
+    max-width: 520px;
+    margin: 0 auto 1.8rem;
+    text-align: center;
 }}
 
-/* ── CTA button (hero) ── */
-.cta-wrapper {{
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2.8rem;
-}}
+/* ══ ALL BUTTONS — base green ════════════════════════════════════════════════ */
 .stButton > button {{
     background: var(--accent) !important;
     color: #fff !important;
@@ -228,24 +255,25 @@ html, body, [class*="css"] {{
     font-family: 'Sora', sans-serif !important;
     font-weight: 700 !important;
     font-size: 0.95rem !important;
-    padding: 0.8rem 2.2rem !important;
+    padding: 0.78rem 2rem !important;
     transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
-    box-shadow: 0 3px 16px rgba(0,179,65,0.3) !important;
+    box-shadow: 0 3px 16px rgba(0,179,65,0.28) !important;
     width: 100% !important;
     letter-spacing: 0.01em !important;
 }}
 .stButton > button:hover {{
     background: var(--accent-hover) !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(0,179,65,0.38) !important;
+    box-shadow: 0 8px 24px rgba(0,179,65,0.36) !important;
 }}
 
-/* ── Stats row ── */
+/* ══ STATS ROW ═══════════════════════════════════════════════════════════════ */
 .stats-row {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2.2rem;
+    width: 100%;
 }}
 .stat-card {{
     background: var(--bg2);
@@ -254,64 +282,55 @@ html, body, [class*="css"] {{
     padding: 1.1rem 0.8rem;
     text-align: center;
     box-shadow: var(--card-shadow);
-    transition: transform 0.18s, box-shadow 0.18s;
+    transition: transform 0.18s;
 }}
-.stat-card:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-}}
+.stat-card:hover {{ transform: translateY(-2px); }}
 .stat-val {{
-    font-size: 1.4rem; font-weight: 800;
+    font-size: 1.35rem; font-weight: 800;
     color: var(--text-strong);
     letter-spacing: -0.04em;
-    margin-bottom: 0.25rem;
-    font-family: 'Sora', sans-serif;
+    margin-bottom: 0.22rem;
 }}
 .stat-val.green {{ color: var(--accent); }}
-.stat-lbl {{ font-size: 0.67rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }}
+.stat-lbl {{ font-size: 0.66rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }}
 
-/* ── Feature cards ── */
+/* ══ FEATURE CARDS ═══════════════════════════════════════════════════════════ */
 .features-grid {{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2.2rem;
+    width: 100%;
 }}
 .feature-card {{
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 1.3rem 1.15rem;
+    padding: 1.25rem 1.1rem;
     box-shadow: var(--card-shadow);
-    transition: transform 0.18s, box-shadow 0.18s;
+    transition: transform 0.18s;
 }}
-.feature-card:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.09);
-}}
-.feature-icon {{ font-size: 1.4rem; margin-bottom: 0.55rem; }}
-.feature-title {{ font-size: 0.84rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.3rem; }}
-.feature-desc {{ font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }}
+.feature-card:hover {{ transform: translateY(-2px); }}
+.feature-icon {{ font-size: 1.35rem; margin-bottom: 0.5rem; }}
+.feature-title {{ font-size: 0.83rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.28rem; }}
+.feature-desc {{ font-size: 0.74rem; color: var(--text-muted); line-height: 1.55; }}
 
-/* ── Trust strip ── */
+/* ══ TRUST STRIP ═════════════════════════════════════════════════════════════ */
 .trust-strip {{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
-    padding: 1rem 0 2rem;
+    gap: 1.4rem;
+    padding: 1rem 0 1.8rem;
     border-top: 1px solid var(--border);
     flex-wrap: wrap;
 }}
 .trust-item {{
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.7rem; font-weight: 600;
     color: var(--text-muted);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+    display: flex; align-items: center; gap: 0.32rem;
 }}
 .trust-dot {{
     width: 5px; height: 5px;
@@ -320,204 +339,221 @@ html, body, [class*="css"] {{
     display: inline-block;
 }}
 
-/* ── Chat header ── */
+/* ══ BACK BUTTON ════════════════════════════════════════════════════════════ */
+.back-wrap .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    padding: 0.42rem 0.95rem !important;
+    box-shadow: none !important;
+    width: auto !important;
+    transform: none !important;
+    letter-spacing: 0 !important;
+}}
+.back-wrap .stButton > button:hover {{
+    background: var(--bg3) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}}
+
+/* ══ CHAT HEADER ════════════════════════════════════════════════════════════ */
 .chat-header {{
-    padding: 1.6rem 0 0.9rem;
+    padding: 1.4rem 0 0.85rem;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.3rem;
 }}
 .chat-title {{
     font-family: 'DM Serif Display', serif;
-    font-size: 1.6rem;
+    font-size: 1.55rem;
     font-weight: 400;
     color: var(--text-strong);
-    margin: 0 0 0.2rem;
+    margin: 0 0 0.18rem;
     letter-spacing: -0.01em;
 }}
-.chat-sub {{ font-size: 0.82rem; color: var(--text-muted); }}
+.chat-sub {{ font-size: 0.81rem; color: var(--text-muted); }}
 
-/* ── Suggestion chips ── */
+/* ══ SUGGESTION CHIPS ════════════════════════════════════════════════════════ */
 div[data-testid="column"] .stButton > button {{
     background: var(--bg2) !important;
     color: var(--text) !important;
-    border: 1px solid var(--border) !important;
+    border: 1.5px solid var(--border) !important;
     border-radius: 999px !important;
-    font-size: 0.78rem !important;
+    font-size: 0.77rem !important;
     font-weight: 500 !important;
-    padding: 0.44rem 1rem !important;
+    padding: 0.42rem 1rem !important;
     box-shadow: var(--card-shadow) !important;
     text-align: left !important;
-    width: auto !important;
+    width: 100% !important;
     letter-spacing: 0 !important;
+    transform: none !important;
 }}
 div[data-testid="column"] .stButton > button:hover {{
     background: var(--bg3) !important;
     border-color: var(--accent) !important;
     color: var(--accent) !important;
     transform: none !important;
-    box-shadow: 0 2px 10px rgba(0,179,65,0.15) !important;
+    box-shadow: 0 2px 10px rgba(0,179,65,0.12) !important;
 }}
 
-/* ── Message bubbles ── */
+/* ══ MESSAGE BUBBLES ═════════════════════════════════════════════════════════ */
 .msg-user {{
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 1rem;
+    display: flex; justify-content: flex-end; margin-bottom: 1rem;
 }}
 .msg-user .bubble {{
-    background: var(--bubble-user-bg);
-    color: #fff;
+    background: var(--bubble-user-bg); color: #fff;
     border-radius: 18px 18px 4px 18px;
-    padding: 0.8rem 1.15rem;
-    max-width: 78%;
-    font-size: 0.9rem;
-    line-height: 1.65;
-    box-shadow: 0 2px 12px rgba(37,99,235,0.25);
+    padding: 0.78rem 1.1rem; max-width: 78%;
+    font-size: 0.9rem; line-height: 1.65;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.22);
 }}
 .msg-bot {{
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 1rem;
-    gap: 0.55rem;
-    align-items: flex-start;
+    display: flex; justify-content: flex-start;
+    margin-bottom: 1rem; gap: 0.5rem; align-items: flex-start;
 }}
-.msg-error .bubble {{
-    border-left: 3px solid #ef4444 !important;
-}}
+.msg-error .bubble {{ border-left: 3px solid #ef4444 !important; }}
 .bot-avatar {{
     width: 32px; height: 32px;
-    background: var(--pill-bg);
-    border: 1px solid var(--pill-border);
+    background: var(--pill-bg); border: 1px solid var(--pill-border);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-    margin-top: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; flex-shrink: 0; margin-top: 3px;
 }}
 .msg-bot .bubble {{
-    background: var(--bubble-bot-bg);
-    color: var(--bubble-bot-text);
+    background: var(--bubble-bot-bg); color: var(--bubble-bot-text);
     border: 1px solid var(--border);
     border-radius: 4px 18px 18px 18px;
-    padding: 0.8rem 1.15rem;
-    max-width: 78%;
-    font-size: 0.9rem;
-    line-height: 1.7;
+    padding: 0.78rem 1.1rem; max-width: 78%;
+    font-size: 0.9rem; line-height: 1.7;
     box-shadow: var(--card-shadow);
 }}
 .meta {{
-    font-size: 0.68rem;
-    color: var(--text-muted);
-    margin-top: 0.55rem;
-    font-family: 'DM Mono', monospace;
+    font-size: 0.67rem; color: var(--text-muted);
+    margin-top: 0.5rem; font-family: 'DM Mono', monospace;
 }}
 
-/* ── Disclaimer ── */
+/* ══ DISCLAIMER ══════════════════════════════════════════════════════════════ */
 .disclaimer {{
     background: var(--disc-bg);
     border: 1px solid var(--disc-border);
     border-radius: 10px;
     padding: 0.7rem 1rem;
-    font-size: 0.78rem;
-    color: var(--disc-color);
-    margin-bottom: 1.2rem;
-    line-height: 1.55;
+    font-size: 0.77rem; color: var(--disc-color);
+    margin-bottom: 1.2rem; line-height: 1.55;
 }}
 
-/* ── Input / send ── */
+/* ══ TEXT INPUT ═══════════════════════════════════════════════════════════════ */
 .stTextInput input {{
     background: var(--input-bg) !important;
-    border: 1px solid var(--border) !important;
+    border: 1.5px solid var(--border) !important;
     border-radius: 10px !important;
     color: var(--text) !important;
     font-family: 'Sora', sans-serif !important;
     font-size: 0.9rem !important;
-    padding: 0.7rem 1rem !important;
+    height: 46px !important;
+    padding: 0 1rem !important;
+    box-sizing: border-box !important;
 }}
 .stTextInput input:focus {{
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(0,179,65,0.15) !important;
-}}
-.send-wrap .stButton > button {{
-    padding: 0.7rem 1rem !important;
-    font-size: 0.88rem !important;
-    border-radius: 10px !important;
+    box-shadow: 0 0 0 3px rgba(0,179,65,0.13) !important;
+    outline: none !important;
 }}
 
-.back-wrap .stButton > button {{
-    background: var(--bg2) !important;
-    color: var(--text) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
-    font-size: 0.82rem !important;
-    font-weight: 500 !important;
-    padding: 0.4rem 0.9rem !important;
-    box-shadow: none !important;
-    width: auto !important;
+/* ══ SEND BUTTON — matches input height ══════════════════════════════════════ */
+.send-wrap {{ width: 100%; }}
+.send-wrap .stButton > button {{
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 0.5rem !important;
+    font-size: 0.88rem !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    box-shadow: 0 2px 10px rgba(0,179,65,0.22) !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }}
-.back-wrap .stButton > button:hover {{
-    background: var(--bg3) !important;
+.send-wrap .stButton > button:hover {{
     transform: none !important;
 }}
 
-/* ── Footer ── */
+/* ══ FOOTER ══════════════════════════════════════════════════════════════════ */
 .site-footer {{
     text-align: center;
-    padding-top: 2rem;
+    padding-top: 1.8rem;
     color: var(--footer-color);
-    font-size: 0.7rem;
+    font-size: 0.69rem;
     border-top: 1px solid var(--border);
     margin-top: 1.5rem;
     letter-spacing: 0.02em;
+    width: 100%;
 }}
 
-/* ── Responsive ── */
+/* ══ RESPONSIVE ══════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {{
     .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
     .features-grid {{ grid-template-columns: repeat(2, 1fr); }}
-    .navbar-brand {{ font-size: 1.6rem; }}
-    .hero {{ padding: 2rem 0 1.5rem; }}
-    .trust-strip {{ gap: 1rem; }}
+    .nav-brand {{ font-size: 1.6rem; }}
+    .block-container {{
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }}
 }}
 @media (max-width: 400px) {{
     .features-grid {{ grid-template-columns: 1fr; }}
-    .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
-    .block-container {{ padding-left: 0.8rem !important; padding-right: 0.8rem !important; }}
+    .block-container {{
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }}
 }}
 </style>
 """, unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# HOME PAGE
-# ════════════════════════════════════════════════════════════════════════════
-def render_home():
-    moon_or_sun = "☀️" if dark else "🌙"
-    title = "Turn off the lights" if not dark else "Turn on the lights"
-
-    st.markdown(f"""
-    <div class="navbar">
-        <div class="navbar-brand">Groww</div>
-        <div class="navbar-right">
-            <div class="navbar-pill">HDFC AMC · Facts Only</div>
+# ═════════════════════════════════════════════════════════════════════════════
+# SHARED NAVBAR
+# The brand + pill are pure HTML (left col); the toggle is a Streamlit button
+# (right col) so Streamlit can handle the click. A negative margin-top pulls
+# the right col up to align with the left col's border-bottom line.
+# ═════════════════════════════════════════════════════════════════════════════
+def render_navbar(page_key: str):
+    col_l, col_r = st.columns([9, 1])
+    with col_l:
+        st.markdown("""
+        <div class="nav-left">
+            <span class="nav-brand">Groww</span>
+            <span class="nav-pill">HDFC AMC · Facts Only</span>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Theme toggle button — rendered as Streamlit button to capture click
-    col_space, col_toggle = st.columns([9, 1])
-    with col_toggle:
-        if st.button(moon_or_sun, key="theme_home", help=title):
+        """, unsafe_allow_html=True)
+    with col_r:
+        st.markdown("""
+        <div class="nav-right">
+        """, unsafe_allow_html=True)
+        if st.button(moon_or_sun, key=f"theme_{page_key}"):
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# HOME PAGE
+# ═════════════════════════════════════════════════════════════════════════════
+def render_home():
+    render_navbar("home")
 
     st.markdown("""
     <div class="hero">
-        <div class="hero-tag"><span class="green-dot"></span>&nbsp;Official sources only · No investment advice</div>
+        <div class="hero-tag">
+            <span class="green-dot"></span>&nbsp;Official sources only · No investment advice
+        </div>
         <h1 class="hero-title">
-            Stop guessing.<br>
+            <span class="stop-guess">Stop Guessing.</span>
             Get <span class="accent">fund facts</span> you can<br>
             <span class="underline-word">actually trust</span>.
         </h1>
@@ -529,15 +565,15 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # CTA button right below the description
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
+    # CTA — perfectly centred
+    col_l, col_c, col_r = st.columns([1.5, 2, 1.5])
+    with col_c:
         if st.button("Ask a question →", key="cta_btn"):
             st.session_state.page = "chat"
             st.rerun()
 
     st.markdown("""
-    <div class="stats-row" style="margin-top:2.5rem;">
+    <div class="stats-row" style="margin-top:2.4rem;">
         <div class="stat-card">
             <div class="stat-val green">15+</div>
             <div class="stat-lbl">Official Sources</div>
@@ -598,21 +634,22 @@ def render_home():
     </div>
 
     <div class="site-footer">
-        Data from HDFC AMC · AMFI · SEBI · Groww &nbsp;·&nbsp; Facts only · No investment advice · No PII stored
+        Data from HDFC AMC · AMFI · SEBI · Groww &nbsp;·&nbsp;
+        Facts only · No investment advice · No PII stored
     </div>
     """, unsafe_allow_html=True)
 
 
-# ════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 # CHAT PAGE
-# ════════════════════════════════════════════════════════════════════════════
+# ═════════════════════════════════════════════════════════════════════════════
 SUGGESTIONS = [
-    ("📊  Expense ratio — HDFC Top 100", "What is the expense ratio of HDFC Top 100 Fund?"),
-    ("🔒  ELSS lock-in period", "What is the lock-in period for HDFC ELSS Tax Saver Fund?"),
+    ("📊  Expense ratio — HDFC Top 100",    "What is the expense ratio of HDFC Top 100 Fund?"),
+    ("🔒  ELSS lock-in period",              "What is the lock-in period for HDFC ELSS Tax Saver Fund?"),
     ("📄  Download capital gains statement", "How do I download capital gains statement from HDFC AMC?"),
-    ("💸  Minimum SIP — HDFC Flexi Cap", "What is the minimum SIP amount for HDFC Flexi Cap Fund?"),
-    ("🚪  Exit load — Balanced Advantage", "What is the exit load for HDFC Balanced Advantage Fund?"),
-    ("📈  Benchmark — HDFC Flexi Cap", "What is the benchmark index for HDFC Flexi Cap Fund?"),
+    ("💸  Minimum SIP — HDFC Flexi Cap",    "What is the minimum SIP amount for HDFC Flexi Cap Fund?"),
+    ("🚪  Exit load — Balanced Advantage",  "What is the exit load for HDFC Balanced Advantage Fund?"),
+    ("📈  Benchmark — HDFC Flexi Cap",      "What is the benchmark index for HDFC Flexi Cap Fund?"),
 ]
 
 def call_api(question: str) -> str:
@@ -621,59 +658,45 @@ def call_api(question: str) -> str:
     return r.json()["answer"]
 
 def render_chat():
-    moon_or_sun = "☀️" if dark else "🌙"
+    render_navbar("chat")
 
-    # Navbar with theme toggle
-    st.markdown("""
-    <div class="navbar">
-        <div class="navbar-brand">Groww</div>
-        <div class="navbar-right">
-            <div class="navbar-pill">HDFC AMC · Facts Only</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    nav_col, toggle_col = st.columns([9, 1])
-    with toggle_col:
-        if st.button(moon_or_sun, key="theme_chat"):
-            st.session_state.dark_mode = not st.session_state.dark_mode
-            st.rerun()
-
-    # Back button
+    # ── Back button ──────────────────────────────────────────────────────────
     st.markdown('<div class="back-wrap">', unsafe_allow_html=True)
-    col_b, _ = st.columns([1, 6])
+    col_b, _ = st.columns([1, 5])
     with col_b:
         if st.button("← Back", key="back_btn"):
             st.session_state.page = "home"
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Header
+    # ── Chat header ──────────────────────────────────────────────────────────
     st.markdown("""
     <div class="chat-header">
-        <div style="display:flex;align-items:center;gap:0.55rem;margin-bottom:0.25rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
             <div class="chat-title">Fund Facts</div>
-            <span style="background:#dcfce7;color:#16a34a;font-size:0.65rem;font-weight:700;
-                padding:0.18rem 0.6rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;">
-                Online
-            </span>
+            <span style="background:#dcfce7;color:#16a34a;font-size:0.63rem;font-weight:700;
+                padding:0.16rem 0.55rem;border-radius:999px;letter-spacing:0.06em;
+                text-transform:uppercase;">Online</span>
         </div>
-        <div class="chat-sub">Ask about HDFC mutual funds · Expense ratios, exit loads, SIP minimums &amp; more</div>
+        <div class="chat-sub">
+            Ask about HDFC mutual funds · Expense ratios, exit loads, SIP minimums &amp; more
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Disclaimer
+    # ── Disclaimer ───────────────────────────────────────────────────────────
     st.markdown("""
     <div class="disclaimer">
-        ⚠️ <strong>Facts-only assistant.</strong> Provides factual information from official HDFC AMC,
-        SEBI &amp; AMFI documents only. Not investment advice. Verify with official sources before any decision.
+        ⚠️ <strong>Facts-only assistant.</strong> Provides factual information from official
+        HDFC AMC, SEBI &amp; AMFI documents only. Not investment advice.
+        Verify with official sources before any decision.
     </div>
     """, unsafe_allow_html=True)
 
-    # Suggestion chips — shown only when chat is empty
+    # ── Suggestion chips ─────────────────────────────────────────────────────
     if not st.session_state.messages:
         st.markdown("""
-        <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;
+        <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;
             text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;">
             Try a question
         </p>""", unsafe_allow_html=True)
@@ -685,7 +708,7 @@ def render_chat():
                     st.rerun()
         st.markdown("<br>", unsafe_allow_html=True)
 
-    # Render history
+    # ── Chat history ─────────────────────────────────────────────────────────
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.markdown(f"""
@@ -703,7 +726,7 @@ def render_chat():
                 </div>
             </div>""", unsafe_allow_html=True)
 
-    # Handle chip-triggered query
+    # ── Chip-triggered query ─────────────────────────────────────────────────
     if st.session_state.pending_query:
         q = st.session_state.pending_query
         st.session_state.pending_query = ""
@@ -720,7 +743,7 @@ def render_chat():
                 })
         st.rerun()
 
-    # Input row
+    # ── Input + Send (vertically aligned) ───────────────────────────────────
     st.markdown("<br>", unsafe_allow_html=True)
     inp_col, btn_col = st.columns([5, 1])
     with inp_col:
@@ -751,12 +774,13 @@ def render_chat():
 
     st.markdown("""
     <div class="site-footer">
-        Data from HDFC AMC · AMFI · SEBI &nbsp;·&nbsp; Facts only · No investment advice · No PII stored
+        Data from HDFC AMC · AMFI · SEBI &nbsp;·&nbsp;
+        Facts only · No investment advice · No PII stored
     </div>
     """, unsafe_allow_html=True)
 
 
-# ─── Router ──────────────────────────────────────────────────────────────────
+# ─── Router ───────────────────────────────────────────────────────────────────
 if st.session_state.page == "home":
     render_home()
 else:
