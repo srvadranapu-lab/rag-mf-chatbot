@@ -23,14 +23,12 @@ query = st.text_input("Ask your question:")
 
 if query:
     with st.spinner("Fetching answer..."):
-       try:
-    response = requests.post(API_URL, json={"question": query})
-    response.raise_for_status()
-    answer = response.json()["answer"]
-except:
-    answer = "Error fetching answer. Please try again."
+        try:
+            response = requests.post(API_URL, json={"question": query})
+            response.raise_for_status()
+            answer = response.json()["answer"]
+        except:
+            answer = "Error fetching answer. Please try again."
 
         st.markdown("### Answer")
         st.write(answer)
-        st.markdown("---")
-st.caption("Data sourced from HDFC AMC, AMFI, SEBI, and Groww.")
