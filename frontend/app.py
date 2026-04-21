@@ -186,33 +186,7 @@ html, body, [class*="css"] {{
     width: 100%;
     box-sizing: border-box;
 }}
-/* Style the toggle as a compact pill button right beside the nav-pill */
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button {{
-    background: var(--bg2) !important;
-    color: var(--text) !important;
-    border: 1.5px solid var(--border) !important;
-    border-radius: 20px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    padding: 0 0.8rem !important;
-    font-size: 0.72rem !important;
-    font-weight: 600 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    letter-spacing: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-left: auto !important;
-    white-space: nowrap !important;
-    width: auto !important;
-}}
-div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stButton > button:hover {{
-    border-color: var(--accent) !important;
-    background: var(--bg3) !important;
-    transform: none !important;
-    box-shadow: none !important;
-}}
+
 
 /* ══ HERO ════════════════════════════════════════════════════════════════════ */
 .hero {{
@@ -288,12 +262,40 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:last-child .stB
 }}
 
 /* ══ CTA BUTTON — centered ═══════════════════════════════════════════════════ */
-div[data-testid="stHorizontalBlock"]:has(#cta_btn) {{
-    justify-content: center !important;
-}}
-#cta_btn ~ div, button[kind="primary"]#cta_btn {{
+.cta-center-wrap {{
     display: flex;
     justify-content: center;
+    margin-bottom: 0.5rem;
+}}
+.cta-center-wrap .stButton > button {{
+    width: auto !important;
+    padding: 0.78rem 2.4rem !important;
+}}
+
+/* ══ NAVBAR ICON BUTTON (theme toggle beside pill) ═══════════════════════════ */
+.nav-icon-wrap .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 50% !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    font-size: 1rem !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    margin-top: 1.1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}}
+.nav-icon-wrap .stButton > button:hover {{
+    border-color: var(--accent) !important;
+    background: var(--bg3) !important;
+    transform: none !important;
+    box-shadow: none !important;
 }}
 
 /* ══ ALL BUTTONS — base green ════════════════════════════════════════════════ */
@@ -539,27 +541,7 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
     align-items: flex-end !important;
 }}
 
-/* ══ CTA HTML BUTTON ═════════════════════════════════════════════════════════ */
-.cta-html-btn {{
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    padding: 0.78rem 2.4rem;
-    cursor: pointer;
-    box-shadow: 0 3px 16px rgba(0,179,65,0.28);
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    letter-spacing: 0.01em;
-    display: inline-block;
-}}
-.cta-html-btn:hover {{
-    background: var(--accent-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,179,65,0.36);
-}}
+
 
 /* ══ FOOTER ══════════════════════════════════════════════════════════════════ */
 .site-footer {{
@@ -602,21 +584,23 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
     icon = "☀️" if dark else "🌙"
-    st.markdown(f"""
-    <div class="nav-left">
-        <span class="nav-brand">Groww</span>
-        <div class="nav-right-group">
-            <span class="nav-pill">HDFC AMC · Facts Only</span>
-            <button class="nav-icon-btn" onclick="document.querySelector('#theme_{page_key}_real button').click()">{icon}</button>
+    nav_col, btn_col = st.columns([10, 1])
+    with nav_col:
+        st.markdown(f"""
+        <div class="nav-left">
+            <span class="nav-brand">Groww</span>
+            <div class="nav-right-group">
+                <span class="nav-pill">HDFC AMC · Facts Only</span>
+            </div>
         </div>
-    </div>
-    <hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">
-    """, unsafe_allow_html=True)
-    st.markdown('<div id="theme_{}_real" style="display:none;">'.format(page_key), unsafe_allow_html=True)
-    if st.button(icon, key=f"theme_{page_key}"):
-        st.session_state.dark_mode = not st.session_state.dark_mode
-        st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    with btn_col:
+        st.markdown('<div class="nav-icon-wrap">', unsafe_allow_html=True)
+        if st.button(icon, key=f"theme_{page_key}"):
+            st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<hr style="margin:0;border:none;border-top:1px solid var(--border);width:100%;">', unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -642,13 +626,8 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # CTA — perfectly centred via HTML
-    st.markdown("""
-    <div style="display:flex;justify-content:center;margin-bottom:0.5rem;">
-        <button class="cta-html-btn" onclick="document.querySelector('#cta_real button').click()">Ask a question →</button>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown('<div id="cta_real" style="display:none;">', unsafe_allow_html=True)
+    # CTA — centred Streamlit button
+    st.markdown('<div class="cta-center-wrap">', unsafe_allow_html=True)
     if st.button("Ask a question →", key="cta_btn"):
         st.session_state.page = "chat"
         st.rerun()
