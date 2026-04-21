@@ -4,7 +4,7 @@ import requests
 st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 
 # Backend API URL (REPLACE with your Render URL)
-API_URL = "https://rag-mf-chatbot-1.onrender.com/"
+API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
 # Title
 st.title("Mutual Fund FAQ Assistant")
@@ -24,11 +24,13 @@ query = st.text_input("Ask your question:")
 if query:
     with st.spinner("Fetching answer..."):
         try:
-            response = requests.post(API_URL, json={"question": query})
-            response.raise_for_status()
-            answer = response.json()["answer"]
-        except:
-            answer = "Error fetching answer. Please try again."
+    response = requests.post(API_URL, json={"question": query})
+    st.write("Status Code:", response.status_code)
+    st.write("Response:", response.text)
+    response.raise_for_status()
+    answer = response.json()["answer"]
+except Exception as e:
+    answer = f"Error: {e}"
 
         st.markdown("### Answer")
         st.write(answer)
