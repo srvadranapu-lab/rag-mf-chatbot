@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 st.set_page_config(
-    page_title="FundFacts – MF FAQ Assistant",
+    page_title="Groww – MF FAQ Assistant",
     layout="centered",
     page_icon="💹",
     initial_sidebar_state="collapsed",
@@ -17,316 +17,475 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "pending_query" not in st.session_state:
     st.session_state.pending_query = ""
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
+
+# ─── Theme toggle ────────────────────────────────────────────────────────────
+dark = st.session_state.dark_mode
 
 # ─── Global CSS ──────────────────────────────────────────────────────────────
-st.markdown("""
+theme_vars = """
+    --bg:           #0d1117;
+    --bg2:          #161b22;
+    --bg3:          #1c2128;
+    --border:       #30363d;
+    --text:         #e6edf3;
+    --text-muted:   #7d8590;
+    --text-strong:  #f0f6fc;
+    --accent:       #00c853;
+    --accent-hover: #00e676;
+    --blue:         #2563eb;
+    --pill-bg:      rgba(0,200,83,0.12);
+    --pill-color:   #00c853;
+    --pill-border:  rgba(0,200,83,0.25);
+    --card-shadow:  0 2px 12px rgba(0,0,0,0.4);
+    --bubble-user-bg: #2563eb;
+    --bubble-bot-bg:  #1c2128;
+    --bubble-bot-text:#e6edf3;
+    --input-bg:     #161b22;
+    --footer-color: #30363d;
+    --tag-bg:       rgba(0,200,83,0.1);
+    --tag-border:   rgba(0,200,83,0.2);
+    --tag-color:    #7d8590;
+    --disc-bg:      rgba(255,200,0,0.07);
+    --disc-border:  rgba(255,200,0,0.18);
+    --disc-color:   #b8860b;
+""" if dark else """
+    --bg:           #f7f9f7;
+    --bg2:          #ffffff;
+    --bg3:          #f0f7f0;
+    --border:       #e2e8e2;
+    --text:         #1a2e1a;
+    --text-muted:   #6b7c6b;
+    --text-strong:  #0d1f0d;
+    --accent:       #00b341;
+    --accent-hover: #009933;
+    --blue:         #2563eb;
+    --pill-bg:      #e8f5e9;
+    --pill-color:   #00b341;
+    --pill-border:  #b2dfdb;
+    --card-shadow:  0 1px 4px rgba(0,0,0,0.06);
+    --bubble-user-bg: #2563eb;
+    --bubble-bot-bg:  #ffffff;
+    --bubble-bot-text:#1a2e1a;
+    --input-bg:     #ffffff;
+    --footer-color: #b2c2b2;
+    --tag-bg:       #f0faf0;
+    --tag-border:   #c8e6c9;
+    --tag-color:    #6b7c6b;
+    --disc-bg:      #fffde7;
+    --disc-border:  #ffe082;
+    --disc-color:   #795548;
+"""
+
+st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
 
-html, body, [class*="css"] { font-family: 'Bricolage Grotesque', sans-serif; }
+:root {{
+    {theme_vars}
+}}
 
-.stApp {
-    background: #f7f5f2;
+html, body, [class*="css"] {{
+    font-family: 'Sora', sans-serif;
+    color: var(--text);
+}}
+
+.stApp {{
+    background: var(--bg);
     min-height: 100vh;
-}
+    transition: background 0.3s ease, color 0.3s ease;
+}}
 
-#MainMenu, footer, header { visibility: hidden; }
-.block-container {
+#MainMenu, footer, header {{ visibility: hidden; }}
+
+.block-container {{
     padding-top: 0 !important;
     padding-bottom: 4rem !important;
-    max-width: 780px !important;
-}
+    max-width: 800px !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+}}
 
 /* ── Navbar ── */
-.navbar {
+.navbar {{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.2rem 0 1rem;
+    padding: 1.4rem 0 1rem;
     margin-bottom: 0.5rem;
-    border-bottom: 1px solid #e8e4de;
-}
-.navbar-brand {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    letter-spacing: -0.02em;
-}
-.navbar-brand .dot { color: #2563eb; }
-.navbar-pill {
-    background: #eef2ff;
-    color: #2563eb;
-    font-size: 0.72rem;
+    border-bottom: 1px solid var(--border);
+}}
+.navbar-brand {{
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    font-family: 'Sora', sans-serif;
+    line-height: 1;
+}}
+.navbar-right {{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}}
+.navbar-pill {{
+    background: var(--pill-bg);
+    color: var(--pill-color);
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.28rem 0.8rem;
+    padding: 0.3rem 0.85rem;
     border-radius: 999px;
-    border: 1px solid #c7d7fd;
-}
+    border: 1px solid var(--pill-border);
+    white-space: nowrap;
+}}
+.theme-toggle {{
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}}
 
 /* ── Hero ── */
-.hero {
-    padding: 3rem 0 2rem;
+.hero {{
+    padding: 3.5rem 0 2.2rem;
     text-align: center;
-}
-.hero-tag {
+}}
+.hero-tag {{
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    background: #fff;
-    border: 1px solid #e2e8f0;
+    gap: 0.45rem;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
     border-radius: 999px;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #64748b;
-    padding: 0.3rem 0.9rem;
-    margin-bottom: 1.4rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-.hero-tag .green-dot {
-    width: 6px; height: 6px;
-    background: #22c55e;
+    color: var(--tag-color);
+    padding: 0.32rem 1rem;
+    margin-bottom: 1.6rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}}
+.hero-tag .green-dot {{
+    width: 7px; height: 7px;
+    background: var(--accent);
     border-radius: 50%;
     display: inline-block;
-}
-.hero-title {
-    font-family: 'Lora', serif;
-    font-size: clamp(1.9rem, 5vw, 2.9rem);
-    font-weight: 600;
-    color: #0f172a;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    margin: 0 0 1rem;
-}
-.hero-title .accent { font-style: italic; color: #2563eb; }
-.hero-desc {
-    color: #64748b;
-    font-size: 0.97rem;
+    box-shadow: 0 0 0 3px rgba(0,179,65,0.2);
+}}
+.hero-title {{
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5.5vw, 3.2rem);
     font-weight: 400;
-    line-height: 1.7;
-    max-width: 520px;
+    color: var(--text-strong);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.2rem;
+}}
+.hero-title .accent {{ font-style: italic; color: var(--accent); }}
+.hero-title .underline-word {{
+    position: relative;
+    display: inline-block;
+}}
+.hero-title .underline-word::after {{
+    content: '';
+    position: absolute;
+    bottom: 2px; left: 0;
+    width: 100%; height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.5;
+}}
+.hero-desc {{
+    color: var(--text-muted);
+    font-size: 0.96rem;
+    font-weight: 400;
+    line-height: 1.75;
+    max-width: 530px;
     margin: 0 auto 2rem;
-}
+}}
+
+/* ── CTA button (hero) ── */
+.cta-wrapper {{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.8rem;
+}}
+.stButton > button {{
+    background: var(--accent) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-family: 'Sora', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    padding: 0.8rem 2.2rem !important;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
+    box-shadow: 0 3px 16px rgba(0,179,65,0.3) !important;
+    width: 100% !important;
+    letter-spacing: 0.01em !important;
+}}
+.stButton > button:hover {{
+    background: var(--accent-hover) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0,179,65,0.38) !important;
+}}
 
 /* ── Stats row ── */
-.stats-row {
+.stats-row {{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem;
     margin-bottom: 2.5rem;
-}
-.stat-card {
-    background: #fff;
-    border: 1px solid #e8e4de;
-    border-radius: 14px;
-    padding: 1rem 0.8rem;
+}}
+.stat-card {{
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.1rem 0.8rem;
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.stat-val { font-size: 1.3rem; font-weight: 700; color: #0f172a; letter-spacing: -0.03em; margin-bottom: 0.2rem; }
-.stat-val.blue { color: #2563eb; }
-.stat-lbl { font-size: 0.68rem; font-weight: 500; color: #94a3b8; letter-spacing: 0.04em; text-transform: uppercase; }
+    box-shadow: var(--card-shadow);
+    transition: transform 0.18s, box-shadow 0.18s;
+}}
+.stat-card:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}}
+.stat-val {{
+    font-size: 1.4rem; font-weight: 800;
+    color: var(--text-strong);
+    letter-spacing: -0.04em;
+    margin-bottom: 0.25rem;
+    font-family: 'Sora', sans-serif;
+}}
+.stat-val.green {{ color: var(--accent); }}
+.stat-lbl {{ font-size: 0.67rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }}
 
 /* ── Feature cards ── */
-.features-grid {
+.features-grid {{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     margin-bottom: 2.5rem;
-}
-.feature-card {
-    background: #fff;
-    border: 1px solid #e8e4de;
-    border-radius: 14px;
-    padding: 1.2rem 1.1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-}
-.feature-icon { font-size: 1.3rem; margin-bottom: 0.5rem; }
-.feature-title { font-size: 0.85rem; font-weight: 600; color: #1e293b; margin-bottom: 0.3rem; }
-.feature-desc { font-size: 0.76rem; color: #94a3b8; line-height: 1.5; }
+}}
+.feature-card {{
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.3rem 1.15rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.18s, box-shadow 0.18s;
+}}
+.feature-card:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.09);
+}}
+.feature-icon {{ font-size: 1.4rem; margin-bottom: 0.55rem; }}
+.feature-title {{ font-size: 0.84rem; font-weight: 700; color: var(--text-strong); margin-bottom: 0.3rem; }}
+.feature-desc {{ font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }}
 
-/* ── Primary CTA button ── */
-.stButton > button {
-    background: #2563eb !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    font-family: 'Bricolage Grotesque', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-    padding: 0.75rem 2rem !important;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
-    box-shadow: 0 2px 12px rgba(37,99,235,0.25) !important;
-    width: 100% !important;
-}
-.stButton > button:hover {
-    background: #1d4ed8 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(37,99,235,0.32) !important;
-}
+/* ── Trust strip ── */
+.trust-strip {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem 0 2rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}}
+.trust-item {{
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}}
+.trust-dot {{
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+}}
 
 /* ── Chat header ── */
-.chat-header {
-    padding: 1.6rem 0 0.8rem;
-    border-bottom: 1px solid #e8e4de;
+.chat-header {{
+    padding: 1.6rem 0 0.9rem;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 1.4rem;
-}
-.chat-title {
-    font-family: 'Lora', serif;
-    font-size: 1.55rem;
-    font-weight: 600;
-    color: #0f172a;
+}}
+.chat-title {{
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--text-strong);
     margin: 0 0 0.2rem;
-    letter-spacing: -0.02em;
-}
-.chat-sub { font-size: 0.83rem; color: #94a3b8; }
+    letter-spacing: -0.01em;
+}}
+.chat-sub {{ font-size: 0.82rem; color: var(--text-muted); }}
 
-/* ── Suggestion chips override ── */
-div[data-testid="column"] .stButton > button {
-    background: #fff !important;
-    color: #374151 !important;
-    border: 1px solid #e2e8f0 !important;
+/* ── Suggestion chips ── */
+div[data-testid="column"] .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 999px !important;
-    font-size: 0.79rem !important;
-    font-weight: 400 !important;
-    padding: 0.42rem 1rem !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    padding: 0.44rem 1rem !important;
+    box-shadow: var(--card-shadow) !important;
     text-align: left !important;
     width: auto !important;
-}
-div[data-testid="column"] .stButton > button:hover {
-    background: #eef2ff !important;
-    border-color: #c7d7fd !important;
-    color: #2563eb !important;
+    letter-spacing: 0 !important;
+}}
+div[data-testid="column"] .stButton > button:hover {{
+    background: var(--bg3) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
     transform: none !important;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.12) !important;
-}
+    box-shadow: 0 2px 10px rgba(0,179,65,0.15) !important;
+}}
 
 /* ── Message bubbles ── */
-.msg-user {
+.msg-user {{
     display: flex;
     justify-content: flex-end;
     margin-bottom: 1rem;
-}
-.msg-user .bubble {
-    background: #2563eb;
+}}
+.msg-user .bubble {{
+    background: var(--bubble-user-bg);
     color: #fff;
     border-radius: 18px 18px 4px 18px;
-    padding: 0.75rem 1.1rem;
-    max-width: 80%;
-    font-size: 0.91rem;
-    line-height: 1.6;
-    box-shadow: 0 2px 10px rgba(37,99,235,0.22);
-}
-.msg-bot {
+    padding: 0.8rem 1.15rem;
+    max-width: 78%;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.25);
+}}
+.msg-bot {{
     display: flex;
     justify-content: flex-start;
     margin-bottom: 1rem;
     gap: 0.55rem;
     align-items: flex-start;
-}
-.bot-avatar {
-    width: 30px; height: 30px;
-    background: #eef2ff;
-    border: 1px solid #c7d7fd;
+}}
+.msg-error .bubble {{
+    border-left: 3px solid #ef4444 !important;
+}}
+.bot-avatar {{
+    width: 32px; height: 32px;
+    background: var(--pill-bg);
+    border: 1px solid var(--pill-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
     margin-top: 3px;
-}
-.msg-bot .bubble {
-    background: #fff;
-    border: 1px solid #e8e4de;
-    color: #1e293b;
+}}
+.msg-bot .bubble {{
+    background: var(--bubble-bot-bg);
+    color: var(--bubble-bot-text);
+    border: 1px solid var(--border);
     border-radius: 4px 18px 18px 18px;
-    padding: 0.85rem 1.1rem;
-    max-width: 84%;
-    font-size: 0.91rem;
+    padding: 0.8rem 1.15rem;
+    max-width: 78%;
+    font-size: 0.9rem;
     line-height: 1.7;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-.msg-bot .bubble .meta {
+    box-shadow: var(--card-shadow);
+}}
+.meta {{
     font-size: 0.68rem;
-    color: #94a3b8;
-    margin-top: 0.5rem;
-    border-top: 1px solid #f1f5f9;
-    padding-top: 0.4rem;
-}
-.msg-error .bubble {
-    background: #fef2f2 !important;
-    border-color: #fecaca !important;
-    color: #dc2626 !important;
-}
+    color: var(--text-muted);
+    margin-top: 0.55rem;
+    font-family: 'DM Mono', monospace;
+}}
 
 /* ── Disclaimer ── */
-.disclaimer {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+.disclaimer {{
+    background: var(--disc-bg);
+    border: 1px solid var(--disc-border);
     border-radius: 10px;
     padding: 0.7rem 1rem;
-    font-size: 0.77rem;
-    color: #92400e;
+    font-size: 0.78rem;
+    color: var(--disc-color);
     margin-bottom: 1.2rem;
     line-height: 1.55;
-}
+}}
 
-/* ── Text input ── */
-.stTextInput > div > div > input {
-    background: #fff !important;
-    border: 1.5px solid #e2e8f0 !important;
-    border-radius: 12px !important;
-    font-family: 'Bricolage Grotesque', sans-serif !important;
-    font-size: 0.92rem !important;
-    color: #1e293b !important;
-    padding: 0.78rem 1rem !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
-    transition: border-color 0.2s, box-shadow 0.2s !important;
-}
-.stTextInput > div > div > input:focus {
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
-}
-.stTextInput > div > div > input::placeholder { color: #cbd5e1 !important; }
-.stTextInput label { display: none !important; }
-
-/* ── Send button override ── */
-.send-wrap .stButton > button {
-    background: #2563eb !important;
+/* ── Input / send ── */
+.stTextInput input {{
+    background: var(--input-bg) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 10px !important;
-    padding: 0.78rem 1.2rem !important;
-    font-size: 0.95rem !important;
-    width: 100% !important;
-}
+    color: var(--text) !important;
+    font-family: 'Sora', sans-serif !important;
+    font-size: 0.9rem !important;
+    padding: 0.7rem 1rem !important;
+}}
+.stTextInput input:focus {{
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(0,179,65,0.15) !important;
+}}
+.send-wrap .stButton > button {{
+    padding: 0.7rem 1rem !important;
+    font-size: 0.88rem !important;
+    border-radius: 10px !important;
+}}
 
-/* ── Back button override ── */
-.back-wrap .stButton > button {
-    background: transparent !important;
-    color: #64748b !important;
-    border: 1px solid #e2e8f0 !important;
+.back-wrap .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 8px !important;
-    font-size: 0.8rem !important;
-    padding: 0.38rem 0.85rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    padding: 0.4rem 0.9rem !important;
     box-shadow: none !important;
     width: auto !important;
-}
-.back-wrap .stButton > button:hover {
-    background: #f8fafc !important;
+}}
+.back-wrap .stButton > button:hover {{
+    background: var(--bg3) !important;
     transform: none !important;
-}
+}}
 
 /* ── Footer ── */
-.site-footer {
+.site-footer {{
     text-align: center;
     padding-top: 2rem;
-    color: #cbd5e1;
-    font-size: 0.72rem;
-    border-top: 1px solid #e8e4de;
+    color: var(--footer-color);
+    font-size: 0.7rem;
+    border-top: 1px solid var(--border);
     margin-top: 1.5rem;
-}
+    letter-spacing: 0.02em;
+}}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {{
+    .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
+    .features-grid {{ grid-template-columns: repeat(2, 1fr); }}
+    .navbar-brand {{ font-size: 1.6rem; }}
+    .hero {{ padding: 2rem 0 1.5rem; }}
+    .trust-strip {{ gap: 1rem; }}
+}}
+@media (max-width: 400px) {{
+    .features-grid {{ grid-template-columns: 1fr; }}
+    .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
+    .block-container {{ padding-left: 0.8rem !important; padding-right: 0.8rem !important; }}
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -335,25 +494,52 @@ div[data-testid="column"] .stButton > button:hover {
 # HOME PAGE
 # ════════════════════════════════════════════════════════════════════════════
 def render_home():
-    st.markdown("""
-    <div class="navbar">
-        <div class="navbar-brand">💹 FundFacts<span class="dot">.</span></div>
-        <div class="navbar-pill">HDFC AMC · Facts Only</div>
-    </div>
+    moon_or_sun = "☀️" if dark else "🌙"
+    title = "Turn off the lights" if not dark else "Turn on the lights"
 
+    st.markdown(f"""
+    <div class="navbar">
+        <div class="navbar-brand">Groww</div>
+        <div class="navbar-right">
+            <div class="navbar-pill">HDFC AMC · Facts Only</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Theme toggle button — rendered as Streamlit button to capture click
+    col_space, col_toggle = st.columns([9, 1])
+    with col_toggle:
+        if st.button(moon_or_sun, key="theme_home", help=title):
+            st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
+
+    st.markdown("""
     <div class="hero">
         <div class="hero-tag"><span class="green-dot"></span>&nbsp;Official sources only · No investment advice</div>
-        <h1 class="hero-title">Instant answers to<br><span class="accent">Mutual Fund questions</span></h1>
+        <h1 class="hero-title">
+            Stop guessing.<br>
+            Get <span class="accent">fund facts</span> you can<br>
+            <span class="underline-word">actually trust</span>.
+        </h1>
         <p class="hero-desc">
             Expense ratios, exit loads, SIP minimums, ELSS lock-ins —
             sourced directly from HDFC AMC, SEBI, and AMFI documents.
             Every answer includes a citation link.
         </p>
     </div>
+    """, unsafe_allow_html=True)
 
-    <div class="stats-row">
+    # CTA button right below the description
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("Ask a question →", key="cta_btn"):
+            st.session_state.page = "chat"
+            st.rerun()
+
+    st.markdown("""
+    <div class="stats-row" style="margin-top:2.5rem;">
         <div class="stat-card">
-            <div class="stat-val blue">15+</div>
+            <div class="stat-val green">15+</div>
             <div class="stat-lbl">Official Sources</div>
         </div>
         <div class="stat-card">
@@ -365,7 +551,7 @@ def render_home():
             <div class="stat-lbl">Min SIP (HDFC)</div>
         </div>
         <div class="stat-card">
-            <div class="stat-val blue">3 yrs</div>
+            <div class="stat-val green">3 yrs</div>
             <div class="stat-lbl">ELSS Lock-in</div>
         </div>
     </div>
@@ -398,19 +584,19 @@ def render_home():
         </div>
         <div class="feature-card">
             <div class="feature-icon">🛡️</div>
-            <div class="feature-title">Transparent</div>
-            <div class="feature-desc">If we don't have the data, we say so. No hallucinations.</div>
+            <div class="feature-title">Zero Hallucinations</div>
+            <div class="feature-desc">If we don't have the data, we say so. No made-up figures.</div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1.2, 2, 1.2])
-    with col2:
-        if st.button("Ask a question →", key="cta_btn"):
-            st.session_state.page = "chat"
-            st.rerun()
+    <div class="trust-strip">
+        <span class="trust-item"><span class="trust-dot"></span> HDFC AMC Verified</span>
+        <span class="trust-item"><span class="trust-dot"></span> SEBI Registered</span>
+        <span class="trust-item"><span class="trust-dot"></span> AMFI Data</span>
+        <span class="trust-item"><span class="trust-dot"></span> No PII Stored</span>
+        <span class="trust-item"><span class="trust-dot"></span> Facts Only</span>
+    </div>
 
-    st.markdown("""
     <div class="site-footer">
         Data from HDFC AMC · AMFI · SEBI · Groww &nbsp;·&nbsp; Facts only · No investment advice · No PII stored
     </div>
@@ -435,6 +621,24 @@ def call_api(question: str) -> str:
     return r.json()["answer"]
 
 def render_chat():
+    moon_or_sun = "☀️" if dark else "🌙"
+
+    # Navbar with theme toggle
+    st.markdown("""
+    <div class="navbar">
+        <div class="navbar-brand">Groww</div>
+        <div class="navbar-right">
+            <div class="navbar-pill">HDFC AMC · Facts Only</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    nav_col, toggle_col = st.columns([9, 1])
+    with toggle_col:
+        if st.button(moon_or_sun, key="theme_chat"):
+            st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
+
     # Back button
     st.markdown('<div class="back-wrap">', unsafe_allow_html=True)
     col_b, _ = st.columns([1, 6])
@@ -448,10 +652,9 @@ def render_chat():
     st.markdown("""
     <div class="chat-header">
         <div style="display:flex;align-items:center;gap:0.55rem;margin-bottom:0.25rem;">
-            <span style="font-size:1.3rem;">💹</span>
-            <div class="chat-title">FundFacts</div>
-            <span style="background:#dcfce7;color:#16a34a;font-size:0.65rem;font-weight:600;
-                padding:0.18rem 0.55rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;">
+            <div class="chat-title">Fund Facts</div>
+            <span style="background:#dcfce7;color:#16a34a;font-size:0.65rem;font-weight:700;
+                padding:0.18rem 0.6rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase;">
                 Online
             </span>
         </div>
@@ -470,8 +673,8 @@ def render_chat():
     # Suggestion chips — shown only when chat is empty
     if not st.session_state.messages:
         st.markdown("""
-        <p style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;
-            text-transform:uppercase;color:#94a3b8;margin-bottom:0.6rem;">
+        <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;
+            text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;">
             Try a question
         </p>""", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
@@ -493,7 +696,7 @@ def render_chat():
             err_class = "msg-error" if msg.get("status") == "error" else ""
             st.markdown(f"""
             <div class="msg-bot {err_class}">
-                <div class="bot-avatar">💹</div>
+                <div class="bot-avatar">🌱</div>
                 <div class="bubble">
                     {msg["content"]}
                     <div class="meta">Last updated from sources: HDFC AMC · AMFI · SEBI</div>
@@ -548,7 +751,7 @@ def render_chat():
 
     st.markdown("""
     <div class="site-footer">
-        Data from HDFC AMC · AMFI · SEBI &nbsp;·&nbsp; Facts only · No investment advice
+        Data from HDFC AMC · AMFI · SEBI &nbsp;·&nbsp; Facts only · No investment advice · No PII stored
     </div>
     """, unsafe_allow_html=True)
 
