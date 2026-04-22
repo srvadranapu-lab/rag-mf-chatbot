@@ -114,17 +114,6 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
     pointer-events: none;
 }}
 
-/* Toggle wrapper — outlined box in navbar centre */
-.mf-toggle-box {{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.4px solid {THEME["border"]};
-    border-radius: 10px;
-    padding: 3px 8px;
-    background: {THEME["toggle_bg"]};
-}}
-
 /* ── Page title area ── */
 /* [CHANGED] Replaced st.title() with styled HTML block */
 .mf-title {{
@@ -288,38 +277,32 @@ div[data-testid="stCaptionContainer"] p,
 # ── BACKEND CONFIG (unchanged) ────────────────────────────────────────────────
 API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
-# ── HEADER: Groww logo | toggle (centre) | badge ─────────────────────────────
-col_left, col_mid, col_right = st.columns([4, 1, 4])
+# ── HEADER: Groww logo + badge + dark-mode toggle ─────────────────────────────
+# [CHANGED] Custom navbar rendered as HTML + a Streamlit button for the toggle
+col_logo, col_right = st.columns([6, 1])
 
-with col_left:
+with col_logo:
     st.markdown(f"""
-    <div style="display:flex; align-items:center; height:56px;
-                border-bottom:1.5px solid {THEME['border']};">
-        <div class="mf-logo">Groww<span>mutual funds</span></div>
+    <div class="mf-navbar">
+        <div class="mf-logo">
+            Groww<span>mutual funds</span>
+        </div>
+        <div class="mf-right">
+            <span class="mf-badge">HDFC AMC · Facts Only</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-with col_mid:
-    st.markdown(f"""
-    <div style="display:flex; align-items:center; justify-content:center;
-                height:56px; border-bottom:1.5px solid {THEME['border']};">
-        <div class="mf-toggle-box">
-    """, unsafe_allow_html=True)
+with col_right:
+    # Circular icon-only toggle button
+    st.markdown('<div class="toggle-btn">', unsafe_allow_html=True)
     st.button(
         THEME["toggle_icon"],
         key="theme_toggle",
         on_click=toggle_theme,
         help="Switch between light and dark mode"
     )
-    st.markdown("</div></div>", unsafe_allow_html=True)
-
-with col_right:
-    st.markdown(f"""
-    <div style="display:flex; align-items:center; justify-content:flex-end;
-                height:56px; border-bottom:1.5px solid {THEME['border']};">
-        <span class="mf-badge">HDFC AMC · Facts Only</span>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # ── PAGE TITLE ────────────────────────────────────────────────────────────────
 # [CHANGED] Replaced st.title() + st.markdown() with styled HTML
