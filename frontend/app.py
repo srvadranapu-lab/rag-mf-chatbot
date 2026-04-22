@@ -182,14 +182,18 @@ div[data-testid="stButton"].toggle-btn > button {{
     background: {THEME["toggle_bg"]} !important;
     border: 1.4px solid {THEME["border"]} !important;
     border-radius: 50% !important;
-    width: 36px !important;
-    min-height: 36px !important;
-    height: 36px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    max-height: 30px !important;
     padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 1rem !important;
+    font-size: 0.82rem !important;
+    line-height: 1 !important;
 }}
 
 /* ── Text input ── */
