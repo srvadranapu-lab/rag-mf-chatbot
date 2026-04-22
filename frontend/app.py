@@ -3,7 +3,7 @@ import requests
 
 st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 
-API_URL = "https://rag-mf-chatbot-1259.onrender.com/ask"
+API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
 # Title
 st.title("📊 Mutual Fund FAQ Assistant")
