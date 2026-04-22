@@ -94,7 +94,7 @@ html, body, [class*="css"] {{
 }}
 #MainMenu, footer, header {{ visibility: hidden; }}
 
-/* Page container — full-width, auto margins */
+/* Page container */
 .block-container {{
     padding-top: 0 !important;
     padding-bottom: 4rem !important;
@@ -107,8 +107,7 @@ html, body, [class*="css"] {{
     width: 100% !important;
 }}
 
-/* ══ NAVBAR ROW (rendered as st.columns) ════════════════════════════════════ */
-/* Left col: brand + pill */
+/* ══ NAVBAR ══════════════════════════════════════════════════════════════════ */
 .nav-left {{
     display: flex;
     align-items: center;
@@ -117,11 +116,6 @@ html, body, [class*="css"] {{
     padding: 1.3rem 0 1rem;
     width: 100%;
     box-sizing: border-box;
-}}
-.nav-right-group {{
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
 }}
 .nav-brand {{
     font-size: 2rem;
@@ -144,50 +138,153 @@ html, body, [class*="css"] {{
     border: 1px solid var(--pill-border);
     white-space: nowrap;
 }}
-.nav-icon-btn {{
-    background: var(--bg2);
-    color: var(--text);
-    border: 1.5px solid var(--border);
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
+
+/* ══ ALL BUTTONS — base green (default) ══════════════════════════════════════ */
+.stButton > button {{
+    background: var(--accent) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-family: 'Sora', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    padding: 0.78rem 2rem !important;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
+    box-shadow: 0 3px 16px rgba(0,179,65,0.28) !important;
+    width: 100% !important;
+    letter-spacing: 0.01em !important;
+}}
+.stButton > button:hover {{
+    background: var(--accent-hover) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0,179,65,0.36) !important;
+}}
+
+/* ══ FIX 1: CTA BUTTON — auto width, truly centered ══════════════════════════
+   Uses a unique wrapper class .cta-center-wrap.
+   Doubles the selector to beat the global rule above.
+   ══════════════════════════════════════════════════════════════════════════ */
+.cta-center-wrap {{
     display: flex;
-    align-items: center;
     justify-content: center;
-    transition: border-color 0.2s, background 0.2s;
-    flex-shrink: 0;
-    padding: 0;
-    margin-left: 0.5rem;
-}}
-.nav-icon-btn:hover {{
-    border-color: var(--accent);
-    background: var(--bg3);
-}}
-/* Navbar wrapper — full width with border-bottom */
-.nav-wrapper {{
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1.3rem 0 1rem;
-    border-bottom: 1px solid var(--border);
     width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 0;
+    margin: 0 auto 0.5rem auto;
 }}
-/* Right col: toggle button */
-.nav-right {{
+.cta-center-wrap .stButton > button,
+.cta-center-wrap div[data-testid="column"] .stButton > button {{
+    width: auto !important;
+    min-width: 200px !important;
+    padding: 0.78rem 2.4rem !important;
+    margin: 0 auto !important;
+    display: block !important;
+    transform: none !important;
+}}
+.cta-center-wrap .stButton > button:hover {{
+    transform: translateY(-2px) !important;
+}}
+
+/* ══ FIX 2: THEME TOGGLE — small circle, beats chip selector ═════════════════
+   Unique wrapper class .theme-toggle-wrap with doubled selector ensures
+   these rules win over both the global button rule and the chip rule.
+   ══════════════════════════════════════════════════════════════════════════ */
+.theme-toggle-wrap {{
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 1.3rem 0 1rem;
-    width: 100%;
-    box-sizing: border-box;
+    padding-top: 1rem;
+}}
+.theme-toggle-wrap .stButton > button,
+div[data-testid="column"] .theme-toggle-wrap .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 50% !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    font-size: 1rem !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    letter-spacing: 0 !important;
+}}
+.theme-toggle-wrap .stButton > button:hover,
+div[data-testid="column"] .theme-toggle-wrap .stButton > button:hover {{
+    border-color: var(--accent) !important;
+    background: var(--bg3) !important;
+    transform: none !important;
+    box-shadow: none !important;
 }}
 
+/* ══ SUGGESTION CHIPS ════════════════════════════════════════════════════════ */
+div[data-testid="column"] .stButton > button {{
+    background: var(--bg2) !important;
+    color: var(--text) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 999px !important;
+    font-size: 0.77rem !important;
+    font-weight: 500 !important;
+    padding: 0.42rem 1rem !important;
+    box-shadow: var(--card-shadow) !important;
+    text-align: left !important;
+    width: 100% !important;
+    letter-spacing: 0 !important;
+    transform: none !important;
+}}
+div[data-testid="column"] .stButton > button:hover {{
+    background: var(--bg3) !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    transform: none !important;
+    box-shadow: 0 2px 10px rgba(0,179,65,0.12) !important;
+}}
+
+/* ══ FIX 3: SEND BUTTON — rectangle with text, aligned to input ══════════════
+   Unique wrapper class .send-wrap with doubled selector.
+   ══════════════════════════════════════════════════════════════════════════ */
+.send-wrap {{
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    align-items: flex-end;
+}}
+.send-wrap .stButton > button,
+div[data-testid="column"] .send-wrap .stButton > button {{
+    height: 46px !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 0 1.2rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(0,179,65,0.22) !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    letter-spacing: 0.03em !important;
+    white-space: nowrap !important;
+    border: none !important;
+    color: #fff !important;
+    background: var(--accent) !important;
+}}
+.send-wrap .stButton > button:hover,
+div[data-testid="column"] .send-wrap .stButton > button:hover {{
+    transform: none !important;
+    background: var(--accent-hover) !important;
+    box-shadow: 0 4px 14px rgba(0,179,65,0.34) !important;
+}}
+/* Align send button column with input — remove label gap */
+div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
+    align-items: flex-end !important;
+    gap: 0.5rem !important;
+}}
 
 /* ══ HERO ════════════════════════════════════════════════════════════════════ */
 .hero {{
@@ -260,75 +357,6 @@ html, body, [class*="css"] {{
     text-align: center;
     display: block;
     width: 100%;
-}}
-
-/* ══ CTA BUTTON — centered ═══════════════════════════════════════════════════ */
-.cta-center-wrap {{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin: 0 auto 0.5rem auto;
-    text-align: center;
-}}
-.cta-center-wrap .stButton {{
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-}}
-.cta-center-wrap .stButton > button {{
-    width: auto !important;
-    padding: 0.78rem 2.4rem !important;
-    margin: 0 auto !important;
-    display: block !important;
-}}
-
-/* ══ NAVBAR ICON BUTTON (theme toggle beside pill) ═══════════════════════════ */
-.nav-icon-wrap {{ display: flex; align-items: center; justify-content: flex-end; padding-top: 1rem; }}
-.nav-icon-wrap .stButton > button {{
-    background: var(--bg2) !important;
-    color: var(--text) !important;
-    border: 1.5px solid var(--border) !important;
-    border-radius: 50% !important;
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    min-height: 34px !important;
-    font-size: 1rem !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    margin: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}}
-.nav-icon-wrap .stButton > button:hover {{
-    border-color: var(--accent) !important;
-    background: var(--bg3) !important;
-    transform: none !important;
-    box-shadow: none !important;
-}}
-
-/* ══ ALL BUTTONS — base green ════════════════════════════════════════════════ */
-.stButton > button {{
-    background: var(--accent) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-family: 'Sora', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    padding: 0.78rem 2rem !important;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
-    box-shadow: 0 3px 16px rgba(0,179,65,0.28) !important;
-    width: 100% !important;
-    letter-spacing: 0.01em !important;
-}}
-.stButton > button:hover {{
-    background: var(--accent-hover) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(0,179,65,0.36) !important;
 }}
 
 /* ══ STATS ROW ═══════════════════════════════════════════════════════════════ */
@@ -442,29 +470,6 @@ html, body, [class*="css"] {{
 }}
 .chat-sub {{ font-size: 0.81rem; color: var(--text-muted); }}
 
-/* ══ SUGGESTION CHIPS ════════════════════════════════════════════════════════ */
-div[data-testid="column"] .stButton > button {{
-    background: var(--bg2) !important;
-    color: var(--text) !important;
-    border: 1.5px solid var(--border) !important;
-    border-radius: 999px !important;
-    font-size: 0.77rem !important;
-    font-weight: 500 !important;
-    padding: 0.42rem 1rem !important;
-    box-shadow: var(--card-shadow) !important;
-    text-align: left !important;
-    width: 100% !important;
-    letter-spacing: 0 !important;
-    transform: none !important;
-}}
-div[data-testid="column"] .stButton > button:hover {{
-    background: var(--bg3) !important;
-    border-color: var(--accent) !important;
-    color: var(--accent) !important;
-    transform: none !important;
-    box-shadow: 0 2px 10px rgba(0,179,65,0.12) !important;
-}}
-
 /* ══ MESSAGE BUBBLES ═════════════════════════════════════════════════════════ */
 .msg-user {{
     display: flex; justify-content: flex-end; margin-bottom: 1rem;
@@ -529,36 +534,6 @@ div[data-testid="column"] .stButton > button:hover {{
     outline: none !important;
 }}
 
-/* ══ SEND BUTTON — small rectangle inline with input ════════════════════════ */
-.send-wrap {{ width: 100%; margin-top: 0; display: flex; align-items: flex-end; }}
-.send-wrap .stButton > button {{
-    height: 46px !important;
-    width: 100% !important;
-    min-height: 46px !important;
-    min-width: 52px !important;
-    padding: 0 0.6rem !important;
-    font-size: 1.05rem !important;
-    border-radius: 10px !important;
-    box-shadow: 0 2px 8px rgba(0,179,65,0.22) !important;
-    transform: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
-    letter-spacing: 0 !important;
-}}
-.send-wrap .stButton > button:hover {{
-    transform: none !important;
-    box-shadow: 0 4px 14px rgba(0,179,65,0.34) !important;
-}}
-/* Align send button column with input — remove label gap */
-div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
-    align-items: flex-end !important;
-}}
-
-
-
 /* ══ FOOTER ══════════════════════════════════════════════════════════════════ */
 .site-footer {{
     text-align: center;
@@ -594,9 +569,8 @@ div[data-testid="stHorizontalBlock"]:has(.send-wrap) {{
 
 # ═════════════════════════════════════════════════════════════════════════════
 # SHARED NAVBAR
-# The brand + pill are pure HTML (left col); the toggle is a Streamlit button
-# (right col) so Streamlit can handle the click. A negative margin-top pulls
-# the right col up to align with the left col's border-bottom line.
+# FIX 2: Changed wrapper div from "nav-icon-wrap" → "theme-toggle-wrap"
+# so the circle button CSS wins over the chip selector.
 # ═════════════════════════════════════════════════════════════════════════════
 def render_navbar(page_key: str):
     icon = "☀️" if dark else "🌙"
@@ -609,7 +583,8 @@ def render_navbar(page_key: str):
         </div>
         """, unsafe_allow_html=True)
     with btn_col:
-        st.markdown('<div class="nav-icon-wrap">', unsafe_allow_html=True)
+        # FIX 2: unique wrapper class .theme-toggle-wrap
+        st.markdown('<div class="theme-toggle-wrap">', unsafe_allow_html=True)
         if st.button(icon, key=f"theme_{page_key}"):
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
@@ -641,7 +616,7 @@ def render_home():
     </div>
     """, unsafe_allow_html=True)
 
-    # CTA — centred Streamlit button, placed right below the hero description
+    # FIX 1: CTA centered — unique .cta-center-wrap div ensures auto-width button
     st.markdown('<div class="cta-center-wrap">', unsafe_allow_html=True)
     if st.button("Ask a question →", key="cta_btn"):
         st.session_state.page = "chat"
@@ -817,9 +792,10 @@ def render_chat():
                 })
         st.rerun()
 
-    # ── Input + Send (vertically aligned) ───────────────────────────────────
+    # ── FIX 3: Input + Send button (rectangle, text label, vertically aligned)
+    # Column ratio [7,1] gives the send button enough width for "Send" text.
     st.markdown("<br>", unsafe_allow_html=True)
-    inp_col, btn_col = st.columns([8, 1])
+    inp_col, btn_col = st.columns([7, 1])
     with inp_col:
         user_input = st.text_input(
             "q", value="", key="chat_input",
@@ -827,8 +803,9 @@ def render_chat():
             label_visibility="collapsed",
         )
     with btn_col:
+        # FIX 3: unique wrapper class .send-wrap + "Send" label
         st.markdown('<div class="send-wrap">', unsafe_allow_html=True)
-        send = st.button("↑", key="send_btn")
+        send = st.button("Send", key="send_btn")
         st.markdown('</div>', unsafe_allow_html=True)
 
     if send and user_input.strip():
