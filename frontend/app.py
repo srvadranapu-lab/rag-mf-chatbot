@@ -80,7 +80,7 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 }}
 
 .mf-logo {{
-    font-size: 1.55rem;
+    font-size: 2rem;
     font-weight: 700;
     color: {THEME["green"]};
     letter-spacing: -0.5px;
@@ -281,7 +281,7 @@ with col_logo:
     st.markdown(f"""
     <div class="mf-navbar">
         <div class="mf-logo">
-            groww<span>mutual funds</span>
+            Groww<span>mutual funds</span>
         </div>
         <div class="mf-right">
             <span class="mf-badge">HDFC AMC · Facts Only</span>
