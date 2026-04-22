@@ -6,8 +6,13 @@ st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 # 🔴 Remove anchor link icons
 st.markdown("""
 <style>
-/* Hide header anchor links */
-a.anchor-link {
+/* Remove ALL header anchor links in Streamlit */
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    display: none !important;
+}
+
+/* Also remove any link icon span */
+.css-1jc7ptx, .css-15zrgzn {
     display: none !important;
 }
 </style>
