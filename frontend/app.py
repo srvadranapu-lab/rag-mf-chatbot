@@ -3,6 +3,16 @@ import requests
 
 st.set_page_config(page_title="MF FAQ Assistant", layout="centered")
 
+# 🔴 Remove anchor link icons
+st.markdown("""
+<style>
+/* Hide header anchor links */
+a.anchor-link {
+    display: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 API_URL = "https://rag-mf-chatbot-1.onrender.com/ask"
 
 # Title
